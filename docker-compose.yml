@@ -1,0 +1,6 @@
+services:
+  api:
+    build: ./
+    ports:
+      - 5000:5000
+    command: waitress-serve --port 5000 api:app
