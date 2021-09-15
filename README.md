@@ -1,7 +1,7 @@
 ## 起動方法
 
 ```
-docker-compose build && docker-compose up -d
+docker-compose down && docker-compose build && docker-compose up -d
 ```
 
 以下のサービスが起動する。
@@ -29,13 +29,17 @@ docker run -it \
 ```
 
 
-#### APIサーバ
-
+## APIサーバ
 ```
 waitress-serve --port 5000 api:app
 ```
 
-#### 単体テスト
+```
+export FLASK_APP=api/__init__.py && export FLASK_ENV=development && flask run --host 0.0.0.0
+```
+flaskのdebugモードはimportエラーが出て動かない。([issue](https://github.com/tensorflow/tensorflow/issues/34607))
+
+## 単体テスト
 ```
 pytest -o log_cli=true
 ```
