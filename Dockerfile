@@ -19,6 +19,4 @@ RUN apt-get install -y vim tmux
 RUN python3 -m pip install --upgrade jupyterlab flask waitress pytest
 
 WORKDIR /app
-#COPY api ./api
-#COPY tests ./tests
 

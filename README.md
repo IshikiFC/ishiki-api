@@ -1,17 +1,41 @@
+## 起動方法
+
 ```
-docker build . -t ishiki-api
+docker-compose build && docker-compose up -d
+```
+
+以下のサービスが起動する。
+* APIサーバー: 5000
+* Jupyter: 8080
+
+#### コンテナに入る
+
+```
+docker-compose exec api /bin/bash
+```
+
+#### ログを見る
+```
+docker-compose logs -f api
+```
+
+
+#### docker-composeを使わない場合
+```
+docker build . -t isshki-api
 docker run -it \
-    -v /Users/musui/ishiki/ishiki-api/api:/app/api \
-    -v /Users/musui/ishiki/ishiki-api/tests:/app/tests \
-    -p 5000:5000 \
+    -v /Users/musui/ishiki/ishiki-api/:/app \
     ishiki-api /bin/bash
 ```
 
+
+#### APIサーバ
+
 ```
-export FLASK_APP=api/__init__.py && export FLASK_ENV=development && flask run --host 0.0.0.0
 waitress-serve --port 5000 api:app
 ```
 
+#### 単体テスト
 ```
 pytest -o log_cli=true
 ```
