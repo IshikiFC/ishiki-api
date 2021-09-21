@@ -2,6 +2,7 @@ from logging import getLogger
 
 import pkg_resources
 import tensorflow.compat.v1 as tf
+
 from gfootball.env import football_action_set
 from gfootball.env import observation_preprocessing
 from gfootball.env.players.ppo2_cnn import Player, ObservationStacker
@@ -10,7 +11,7 @@ LOGGER = getLogger(__name__)
 
 
 def build_model_path():
-    return pkg_resources.resource_filename('api', 'models/11_vs_11_easy_stochastic_v2')
+    return pkg_resources.resource_filename('api', 'resources/models/11_vs_11_easy_stochastic_v2')
 
 
 def build_player():
@@ -38,13 +39,23 @@ def evaluate(obs):
 
     validate(obs)
     smm_stacked = build_smm_stacked(obs)
+    return evaluate_internal(smm_stacked)
+
+
+def evaluate_internal(smm_stacked):
     action_probs, value_estimate = policy._evaluate([tf.nn.softmax(policy.pd.logits), policy.vf], smm_stacked)
+    action_probs = action_probs[0]
+    value_estimate = value_estimate[0]
+
     actions = football_action_set.action_set_dict['default']
-    action_prob_dict = dict([(str(action), float(prob)) for action, prob in zip(actions, action_probs[0].tolist())])
+    action_prob_dict = dict([
+        (str(action), round(float(prob), 2))
+        for action, prob in zip(actions, action_probs)
+    ])
 
     return {
         'action': action_prob_dict,
-        'value': float(value_estimate[0])
+        'value': float(value_estimate)
     }
 
 

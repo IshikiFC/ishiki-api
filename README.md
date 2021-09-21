@@ -43,3 +43,8 @@ flaskのdebugモードはimportエラーが出て動かない。([issue](https:/
 ```
 pytest -o log_cli=true
 ```
+
+## シミュレーション
+```
+python script/simulate_game.py
+```

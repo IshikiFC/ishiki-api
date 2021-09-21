@@ -15,8 +15,8 @@ RUN python3 -m pip install --upgrade pip setuptools psutil gfootball \
 
 # Set up api environment
 
-RUN apt-get install -y vim tmux
-RUN python3 -m pip install --upgrade jupyterlab flask waitress pytest
+RUN apt-get install -y vim tmux less
+RUN python3 -m pip install --upgrade jupyterlab flask flask-cors waitress pytest
 
 WORKDIR /app
 

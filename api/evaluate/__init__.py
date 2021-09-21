@@ -15,5 +15,5 @@ def evaluate_grf_api():
     try:
         return jsonify(evaluate_grf(obs))
     except ValueError as e:
-        LOGGER.warning(f'failed to evaluate: {obs}, {e}')
+        LOGGER.exception(f'failed to evaluate: {obs}')
         return jsonify({'message': str(e)}), 400
