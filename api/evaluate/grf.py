@@ -1,33 +1,14 @@
 from logging import getLogger
 
-import pkg_resources
 import tensorflow.compat.v1 as tf
 
+from api.internal.grf import player
 from gfootball.env import football_action_set
 from gfootball.env import observation_preprocessing
-from gfootball.env.players.ppo2_cnn import Player, ObservationStacker
+from gfootball.env.players.ppo2_cnn import ObservationStacker
 
 LOGGER = getLogger(__name__)
 
-
-def build_model_path():
-    return pkg_resources.resource_filename('api', 'resources/models/11_vs_11_easy_stochastic_v2')
-
-
-def build_player():
-    player_config = {
-        'index': 0,
-        'left_players': 1,
-        'right_players': 0,
-        'policy': 'gfootball_impala_cnn',
-        'checkpoint': build_model_path()
-    }
-    env_config = {}
-    return Player(player_config, env_config)
-
-
-# build global player once for evaluate method
-player = build_player()
 policy = player._policy
 
 

@@ -17,6 +17,8 @@ RUN python3 -m pip install --upgrade pip setuptools psutil gfootball \
 
 RUN apt-get install -y vim tmux less
 RUN python3 -m pip install --upgrade jupyterlab flask flask-cors waitress pytest
+RUN python3 -m pip install torch
+RUN python3 -m pip install kaggle-environments pyyaml
 
 WORKDIR /app
 

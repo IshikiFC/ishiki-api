@@ -46,5 +46,5 @@ pytest -o log_cli=true
 
 ## シミュレーション
 ```
-python script/simulate_game.py
+python -m scripts.simulate_game_tamakeri
 ```
