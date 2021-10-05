@@ -46,5 +46,5 @@ pytest -o log_cli=true
 
 ## シミュレーション
 ```
-python -m scripts.simulate_game_tamakeri
+python -m scripts.simulate_game -agent tamakeri -level hard
 ```

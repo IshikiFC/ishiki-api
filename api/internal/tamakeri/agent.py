@@ -30,37 +30,43 @@ class TamakeriAgent:
     def __init__(self):
         self.env = Environment()
         self.model = load_model(self.env.net()(self.env), build_model_path())
+        self._initialize()
 
-        self.prev_action = 0
+    def _initialize(self):
+        self.action = 0
         self.reserved_action = None
         self.probs = np.ones(1)
         self.value = 0
 
+    def reset(self):
+        self.env.reset()
+        self._initialize()
+
     def step(self, obs):
-        info = [{'observation': to_tamakeri_obs(obs), 'action': [self.prev_action]}, None]
+        info = [{'observation': to_tamakeri_obs(obs), 'action': [self.action]}, None]
         self.env.play_info(info)
         logits, value, _, _ = self.model.inference(self.env.observation(0), None)
         self.probs = np.exp(logits) / sum(np.exp(logits))
-        self.value = self.value[0]
+        self.value = value[0]
 
         actions = self.env.legal_actions(0)
-        action = max(actions, key=lambda x: self.logit[x])
+        action = max(actions, key=lambda x: self.probs[x])
 
         if self.reserved_action is not None:
-            self.prev_action, self.reserved_action = self.reserved_action, None
+            self.action, self.reserved_action = self.reserved_action, None
         else:
-            self.prev_action, self.reserved_action = self.env.special_to_actions(action)
-        return self.prev_action
+            self.action, self.reserved_action = self.env.special_to_actions(action)
+        return self.action
 
     def get_action(self, to_name=False):
-        return to_action_name(self.prev_action) if to_name else self.prev_action
+        return to_action_name(self.action) if to_name else self.action
 
     def get_action_probs(self, to_name=False):
         action_probs = dict()
         for idx, prob in enumerate(self.probs):
             key = to_action_name(idx) if to_name else idx
-            action_probs[key] = prob
+            action_probs[key] = float(prob)
         return action_probs
 
     def get_value(self):
-        return self.value
+        return float(self.value)

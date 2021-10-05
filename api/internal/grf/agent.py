@@ -11,6 +11,9 @@ def build_model_path():
 
 
 def build_player():
+    global _player
+    if _player:  # already initialized
+        return _player
     player_config = {
         'index': 0,
         'left_players': 1,
@@ -19,42 +22,50 @@ def build_player():
         'checkpoint': build_model_path()
     }
     env_config = {}
-    return Player(player_config, env_config)
+    _player = Player(player_config, env_config)
+    return _player
 
 
-player = build_player()  # build global player once to avoid loading tf variables multiple times
+_player = None  # cache player to avoid loading tf variables multiple times
 
 
 class GrfAgent:
     def __init__(self):
+        player = build_player()
         self.policy = player._policy
         self.observation_stacker = ObservationStacker(4)
         self.actions = football_action_set.action_set_dict['default']
+        self._initialize()
 
+    def _initialize(self):
         self.probs = np.ones(1)
         self.value = 0
-        self.prev_action = 0
+        self.action = 0
+
+    def reset(self):
+        self.observation_stacker.reset()
+        self._initialize()
 
     def step(self, obs):
-        smm = observation_preprocessing.generate_smm([obs])
+        smm = observation_preprocessing.generate_smm(obs)
         action, probs, value = self.policy._evaluate(
             [self.policy.action, tf.nn.softmax(self.policy.pd.logits), self.policy.vf],
             self.observation_stacker.get(smm)
         )
         self.probs = probs[0]
         self.value = value[0]
-        self.prev_action = action
-        return self.prev_action
+        self.action = action[0]
+        return self.action
 
     def get_action(self, to_name=False):
-        return self.actions[self.prev_action] if to_name else self.prev_action
+        return str(self.actions[self.action]) if to_name else self.action
 
     def get_action_probs(self, to_name=False):
         action_probs = dict()
         for idx, prob in enumerate(self.probs):
-            key = self.actions[idx] if to_name else idx
-            action_probs[key] = prob
+            key = str(self.actions[idx]) if to_name else idx
+            action_probs[key] = float(prob)
         return action_probs
 
     def get_value(self):
-        return self.value
+        return float(self.value)

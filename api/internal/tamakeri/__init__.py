@@ -1,5 +1,5 @@
 """
-Copied and modified from https://github.com/YuriCat/TamakEriFever
+https://github.com/YuriCat/TamakEriFever
 """
 
 from .agent import TamakeriAgent

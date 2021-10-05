@@ -1,8 +1,7 @@
 import json
-
 import pytest
 
-from api.evaluate.grf import build_smm_stacked, evaluate, validate
+from api.evaluate.grf import evaluate, validate
 
 obs_empty = {
     'ball': [0, 0, 0],
@@ -17,11 +16,6 @@ def test_evaluate():
     assert 'action' in response
     assert 'value' in response
     assert json.dumps(response)
-
-
-def test_build_stacked_smm():
-    smm_stacked = build_smm_stacked(obs_empty)
-    assert smm_stacked.shape == (1, 72, 96, 16)
 
 
 def test_validate():

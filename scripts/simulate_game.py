@@ -4,31 +4,43 @@ from __future__ import print_function
 
 from absl import app
 from absl import flags
+from absl import logging
 
-import gfootball.env as football_env
+import gfootball.env
+from api.internal.grf import GrfAgent
+from api.internal.tamakeri import TamakeriAgent
 
 FLAGS = flags.FLAGS
 flags.DEFINE_bool('render', True, 'Whether to do game rendering.')
+flags.DEFINE_enum('agent', 'grf', ['grf', 'tamakeri'], 'Agent to play')
+flags.DEFINE_enum('level', 'easy', ['easy', 'hard'], 'Opponent level')
 
 
 def main(_):
-    env = football_env.create_environment(
-        env_name='11_vs_11_easy_stochastic',
-        number_of_left_players_agent_controls=0,
+    logging.info(f'simulate game: agent={FLAGS.agent}, level={FLAGS.level}')
+    env = gfootball.env.create_environment(
+        env_name=f'11_vs_11_{FLAGS.level}_stochastic',
+        representation='raw',
+        number_of_left_players_agent_controls=1,
         number_of_right_players_agent_controls=0,
-        extra_players=[
-            'ppo2_cnn:left_players=1,policy=gfootball_impala_cnn,checkpoint=/app/api/models/11_vs_11_easy_stochastic_v2',
-        ],
         logdir='/app/logs',
         write_full_episode_dumps=True,
         write_video=True,
         render=True
     )
+    if FLAGS.agent == 'grf':
+        agent = GrfAgent()
+    elif FLAGS.agent == 'tamakeri':
+        agent = TamakeriAgent()
+    else:
+        raise ValueError(f'invalid agent: {FLAGS.agent}')
 
     while True:
-        _, _, done, _ = env.step([])
+        action = agent.get_action()
+        obs, _, done, _ = env.step([action])
         if done:
             break
+        agent.step(obs)
 
 
 if __name__ == '__main__':
