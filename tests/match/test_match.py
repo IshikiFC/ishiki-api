@@ -9,5 +9,11 @@ def test_get_match():
     assert len(match) == num_steps
     assert json.dumps(match)
     for frame in match:
-        for field in ['ball', 'left_team', 'right_team', 'action', 'value']:
-            assert field in frame
+        observation = frame['observation']
+        for field in ['ball', 'left_team', 'right_team']:
+            assert field in observation
+        evaluation = frame['evaluation']
+        for agent in ['grf', 'tamakeri']:
+            assert agent in evaluation
+            for field in ['action', 'value']:
+                assert field in evaluation[agent]

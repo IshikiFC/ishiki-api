@@ -23,7 +23,7 @@ def main(_):
         representation='raw',
         number_of_left_players_agent_controls=1,
         number_of_right_players_agent_controls=0,
-        logdir='/app/logs',
+        logdir='/app/logs/tmp',
         write_full_episode_dumps=True,
         write_video=True,
         render=True
@@ -36,8 +36,7 @@ def main(_):
         raise ValueError(f'invalid agent: {FLAGS.agent}')
 
     while True:
-        action = agent.get_action()
-        obs, _, done, _ = env.step([action])
+        obs, _, done, _ = env.step([agent.action])
         if done:
             break
         agent.step(obs)

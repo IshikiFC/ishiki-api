@@ -11,7 +11,7 @@ def evaluate(obs):
     agent.reset()
     agent.step([obs])
     return {
-        'action': agent.get_action_probs(to_name=True),
+        'action': agent.get_action_probs(),
         'value': float(agent.get_value())
     }
 

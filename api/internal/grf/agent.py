@@ -30,6 +30,8 @@ _player = None  # cache player to avoid loading tf variables multiple times
 
 
 class GrfAgent:
+    name = 'grf'
+
     def __init__(self):
         player = build_player()
         self.policy = player._policy
@@ -57,15 +59,15 @@ class GrfAgent:
         self.action = action[0]
         return self.action
 
-    def get_action(self, to_name=False):
+    def get_action(self, to_name=True):
         return str(self.actions[self.action]) if to_name else self.action
 
-    def get_action_probs(self, to_name=False):
+    def get_action_probs(self, to_name=True):
         action_probs = dict()
         for idx, prob in enumerate(self.probs):
             key = str(self.actions[idx]) if to_name else idx
-            action_probs[key] = float(prob)
+            action_probs[key] = round(float(prob), 4)
         return action_probs
 
     def get_value(self):
-        return float(self.value)
+        return round(float(self.value), 4)

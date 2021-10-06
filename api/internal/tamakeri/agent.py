@@ -27,16 +27,18 @@ def to_action_name(action_idx):
 
 
 class TamakeriAgent:
+    name = 'tamakeri'
+
     def __init__(self):
         self.env = Environment()
         self.model = load_model(self.env.net()(self.env), build_model_path())
         self._initialize()
 
     def _initialize(self):
-        self.action = 0
-        self.reserved_action = None
         self.probs = np.ones(1)
         self.value = 0
+        self.action = 0
+        self.reserved_action = None
 
     def reset(self):
         self.env.reset()
@@ -51,22 +53,21 @@ class TamakeriAgent:
 
         actions = self.env.legal_actions(0)
         action = max(actions, key=lambda x: self.probs[x])
-
         if self.reserved_action is not None:
             self.action, self.reserved_action = self.reserved_action, None
         else:
             self.action, self.reserved_action = self.env.special_to_actions(action)
         return self.action
 
-    def get_action(self, to_name=False):
+    def get_action(self, to_name=True):
         return to_action_name(self.action) if to_name else self.action
 
-    def get_action_probs(self, to_name=False):
+    def get_action_probs(self, to_name=True):
         action_probs = dict()
         for idx, prob in enumerate(self.probs):
             key = to_action_name(idx) if to_name else idx
-            action_probs[key] = float(prob)
+            action_probs[key] = round(float(prob), 4)
         return action_probs
 
     def get_value(self):
-        return float(self.value)
+        return round(float(self.value), 4)
