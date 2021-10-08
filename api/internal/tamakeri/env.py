@@ -39,7 +39,7 @@ class Action(enum.IntEnum):
     Sprint = 13
     ReleaseDirection = 14
     ReleaseSprint = 15
-    Slide = 16
+    Sliding = 16
     Dribble = 17
     ReleaseDribble = 18
 

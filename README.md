@@ -46,5 +46,6 @@ pytest -o log_cli=true
 
 ## シミュレーション
 ```
-python -m scripts.simulate_game -agent tamakeri -level hard
+python -m scripts.simulate_match -agent tamakeri -level hard
+python -m scripts.evaluate_match -input /app/api/resources/matches/grf_hard.dump -output /app/api/resources/matches/grf_hard.dump.eval
 ```

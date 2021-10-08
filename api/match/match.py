@@ -1,47 +1,53 @@
+from logging import getLogger
+
 import pkg_resources
+from pathlib import Path
 
-from api.internal.grf import GrfAgent
-from api.internal.tamakeri import TamakeriAgent
-from gfootball.env import script_helpers
+from api.internal.utils.dump import read_dump
+
+LOGGER = getLogger(__name__)
 
 
-def _read_match(fp):
-    grf_agent = GrfAgent()
-    tamakeri_agent = TamakeriAgent()
-    dump_raw = script_helpers.ScriptHelpers().load_dump(fp)
+def _read_match(name):
+    """
+    read evaluation file and extract necessary information for API
+    """
 
-    match = []
-    for frame_raw in dump_raw[:300]:
-        obs_raw = frame_raw['observation']
-        obs = _convert_observation(obs_raw)
-        grf_agent.step(obs)
-        tamakeri_agent.step(obs)
+    fp = Path(pkg_resources.resource_filename('api', f'resources/matches/{name}.dump'))
+    if not fp.exists():
+        raise ValueError(f'match does not exists: {name}')
+    dump = read_dump(fp)
+    LOGGER.debug('read match from file: {fp}')
 
-        frame = dict()
-        frame['observation'] = dict()
-        for obs_key in ['ball', 'left_team', 'right_team']:
-            frame['observation'][obs_key] = obs_raw[obs_key].tolist()
-        frame['evaluation'] = dict()
-        for agent in [grf_agent, tamakeri_agent]:
-            frame['evaluation'][agent.name] = {
-                'action': agent.get_action_probs(),
-                'value': agent.get_value()
-            }
-        match.append(frame)
+    try:
+        match = []
+        for frame in dump:
+            observation = dict()
+            for obs_key in ['ball', 'left_team', 'right_team']:
+                observation[obs_key] = frame['observation'][obs_key].tolist()
+            evaluation = frame['debug']['evaluation']
+            match.append({
+                'observation': observation,
+                'evaluation': evaluation
+            })
+    except KeyError as e:
+        raise ValueError('match file does not have necessary fields') from e
 
     return match
 
 
-def _convert_observation(observation_raw):
-    observation_raw['active'] = int(observation_raw['left_team_designated_player'])  # for grf
-    observation_raw['sticky_actions'] = observation_raw['left_agent_sticky_actions'][0]  # for tamakeri
-    return [observation_raw]
+def _get_match(name, cache=False):
+    global _matches
+    if not cache or name not in _matches:
+        match = _read_match(name)
+        _matches[name] = match
+    return _matches[name]
 
 
-_match = _read_match(
-    pkg_resources.resource_filename('api', 'resources/matches/episode_done_20210918-064519149416.dump')
-)
+_matches = dict()  # cache matches
 
 
-def get_match(num_steps=-1):
-    return _match[:num_steps] if num_steps > 0 else _match
+def get_match(name=None, num_steps=-1, cache=False):
+    name = name or 'grf_hard'
+    match = _get_match(name=name, cache=cache)
+    return match[:num_steps] if num_steps > 0 else match

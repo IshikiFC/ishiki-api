@@ -17,3 +17,4 @@ def test_get_match():
             assert agent in evaluation
             for field in ['action', 'value']:
                 assert field in evaluation[agent]
+            assert evaluation[agent]['action'][0][0].lower() == 'idle'

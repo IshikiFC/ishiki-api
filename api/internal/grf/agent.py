@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import numpy as np
 import pkg_resources
 import tensorflow.compat.v1 as tf
@@ -59,15 +61,18 @@ class GrfAgent:
         self.action = action[0]
         return self.action
 
-    def get_action(self, to_name=True):
+    def get_action(self, to_name=False):
         return str(self.actions[self.action]) if to_name else self.action
 
-    def get_action_probs(self, to_name=True):
-        action_probs = dict()
+    def get_action_probs(self, to_name=False, to_list=False):
+        probs_dict = OrderedDict()
         for idx, prob in enumerate(self.probs):
             key = str(self.actions[idx]) if to_name else idx
-            action_probs[key] = round(float(prob), 4)
-        return action_probs
+            probs_dict[key] = float(prob)
+        if to_list:
+            return list([e for e in probs_dict.items()])
+        else:
+            return probs_dict
 
     def get_value(self):
-        return round(float(self.value), 4)
+        return float(self.value)
