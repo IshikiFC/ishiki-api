@@ -16,15 +16,16 @@ def _read_match(name):
     fp = Path(pkg_resources.resource_filename('api', f'resources/matches/{name}.dump'))
     if not fp.exists():
         raise ValueError(f'match does not exists: {name}')
-    dump = read_dump(fp)
-    LOGGER.debug('read match from file: {fp}')
+    LOGGER.debug(f'read match from file: {fp}')
 
     try:
+        dump = read_dump(fp)
         match = []
         for frame in dump:
             observation = dict()
             for obs_key in ['ball', 'left_team', 'right_team']:
                 observation[obs_key] = frame['observation'][obs_key].tolist()
+            observation['action'] = str(frame['debug']['action'][0])
             evaluation = frame['debug']['evaluation']
             match.append({
                 'observation': observation,
@@ -36,7 +37,7 @@ def _read_match(name):
     return match
 
 
-def _get_match(name, cache=False):
+def _get_match(name, cache=True):
     global _matches
     if not cache or name not in _matches:
         match = _read_match(name)
@@ -47,7 +48,7 @@ def _get_match(name, cache=False):
 _matches = dict()  # cache matches
 
 
-def get_match(name=None, num_steps=-1, cache=False):
+def get_match(name=None, num_steps=-1, cache=True):
     name = name or 'grf_hard'
     match = _get_match(name=name, cache=cache)
     return match[:num_steps] if num_steps > 0 else match

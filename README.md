@@ -8,6 +8,11 @@ docker-compose down && docker-compose build && docker-compose up -d
 * APIサーバー: 5000
 * Jupyter: 8080
 
+#### 再起動
+```
+docker-compose restart
+```
+
 #### コンテナに入る
 
 ```

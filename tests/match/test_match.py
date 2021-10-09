@@ -10,7 +10,7 @@ def test_get_match():
     assert json.dumps(match)
     for frame in match:
         observation = frame['observation']
-        for field in ['ball', 'left_team', 'right_team']:
+        for field in ['ball', 'left_team', 'right_team', 'action']:
             assert field in observation
         evaluation = frame['evaluation']
         for agent in ['grf', 'tamakeri']:
