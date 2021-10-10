@@ -36,7 +36,7 @@ def main(_):
         raise ValueError(f'invalid agent: {FLAGS.agent}')
 
     while True:
-        obs, _, done, _ = env.step([agent.action])
+        obs, _, done, _ = env.step([agent.get_action()])
         if done:
             break
         agent.step(obs)

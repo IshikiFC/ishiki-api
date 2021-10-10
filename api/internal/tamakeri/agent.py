@@ -75,7 +75,7 @@ class TamakeriAgent:
         return self.action
 
     def get_action(self, to_name=False):
-        return to_action_name(self.action) if to_name else self.action
+        return str(to_action_name(self.action)) if to_name else int(self.action)
 
     def get_action_probs(self, to_name=False, to_base=False, to_list=False):
         probs_dict = dict()

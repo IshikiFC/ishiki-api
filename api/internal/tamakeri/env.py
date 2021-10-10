@@ -327,7 +327,7 @@ class Environment:
                 illegal_actions.add(KICK_ACTIONS[Action.ShortPass] + d)
                 illegal_actions.add(KICK_ACTIONS[Action.Shot] + d)
         else:  # owned
-            illegal_actions.add(int(Action.Slide))
+            illegal_actions.add(int(Action.Sliding))
 
         # Already sticky action?
         sticky_actions = obs['sticky_actions']

@@ -62,7 +62,7 @@ class GrfAgent:
         return self.action
 
     def get_action(self, to_name=False):
-        return str(self.actions[self.action]) if to_name else self.action
+        return str(self.actions[self.action]) if to_name else int(self.action)
 
     def get_action_probs(self, to_name=False, to_list=False):
         probs_dict = OrderedDict()

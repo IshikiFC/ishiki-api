@@ -16,10 +16,11 @@ def _read_match(name):
     fp = Path(pkg_resources.resource_filename('api', f'resources/matches/{name}.dump'))
     if not fp.exists():
         raise ValueError(f'match does not exists: {name}')
-    LOGGER.debug(f'read match from file: {fp}')
+    LOGGER.info(f'read match from file: {fp}')
 
     try:
         dump = read_dump(fp)
+        prev_frame = 0
         match = []
         for frame in dump:
             observation = dict()
@@ -27,10 +28,15 @@ def _read_match(name):
                 observation[obs_key] = frame['observation'][obs_key].tolist()
             observation['action'] = str(frame['debug']['action'][0])
             evaluation = frame['debug']['evaluation']
-            match.append({
-                'observation': observation,
-                'evaluation': evaluation
-            })
+
+            cur_frame = frame['debug']['frame']
+            for _ in range(cur_frame - prev_frame):  # duplicate frames to match with movie
+                match.append({
+                    'observation': observation,
+                    'evaluation': evaluation
+                })
+            prev_frame = cur_frame
+
     except KeyError as e:
         raise ValueError('match file does not have necessary fields') from e
 
@@ -49,6 +55,6 @@ _matches = dict()  # cache matches
 
 
 def get_match(name=None, num_steps=-1, cache=True):
-    name = name or 'grf_hard'
+    name = name or 'tamakeri_hard'
     match = _get_match(name=name, cache=cache)
     return match[:num_steps] if num_steps > 0 else match

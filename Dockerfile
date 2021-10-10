@@ -8,17 +8,17 @@ RUN apt-get update && apt-get --no-install-recommends install -yq git cmake buil
   libgl1-mesa-dev libsdl2-dev \
   libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev libboost-all-dev \
   libdirectfb-dev libst-dev mesa-utils xvfb x11vnc \
-  libsdl-sge-dev python3-pip
+  libsdl-sge-dev python3-pip \
+  vim tmux less wget
 
-RUN python3 -m pip install --upgrade pip setuptools psutil gfootball \
- dm-sonnet==1.* git+https://github.com/openai/baselines.git@master
 
-# Set up api environment
+RUN python3 -m pip install --upgrade pip setuptools psutil \
+ dm-sonnet==1.* git+https://github.com/openai/baselines.git@master \
+ jupyterlab flask flask-cors waitress pytest torch kaggle-environments stringcase tqdm
 
-RUN apt-get install -y vim tmux less
-RUN python3 -m pip install --upgrade jupyterlab flask flask-cors waitress pytest
-RUN python3 -m pip install torch
-RUN python3 -m pip install kaggle-environments stringcase tqdm
+# install modified google-research-football
+RUN git clone https://github.com/IshikiFC/google-research-football.git /gfootball
+RUN cd /gfootball && python3 -m pip install .
 
 WORKDIR /app
 
